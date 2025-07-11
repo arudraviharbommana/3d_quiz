@@ -112,3 +112,18 @@
   </script>
 </body>
 </html>
+
+fetch("http://localhost:3000/submit", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    name: sessionStorage.getItem("name"),
+    email: sessionStorage.getItem("email"),
+    score,
+    total: questions.length,
+    date: new Date().toISOString()
+  })
+})
+.then(() => {
+  window.location.href = "result.html";
+});

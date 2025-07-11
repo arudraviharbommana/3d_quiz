@@ -67,3 +67,11 @@ button:hover {
   font-size: 14px;
 }
 
+body, html {
+  height: 100%;
+  overflow-y: auto; /* Enable vertical scroll */
+}
+.overlay {
+  overflow-y: auto;
+  max-height: 100vh;
+}

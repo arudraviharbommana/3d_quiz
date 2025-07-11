@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>📋 Quiz Scoreboard</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background: url("background.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      padding: 20px;
+    }
+
+    .board {
+      max-width: 800px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ccc;
+    }
+
+    th {
+      background-color: #222;
+    }
+
+    tr:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="board">
+    <h2>🏆 Quiz Scoreboard</h2>
+    <table id="scoreTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Score</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Scores will be injected here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    fetch("http://localhost:3000/scores")
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.querySelector("#scoreTable tbody");
+        data.reverse().forEach(entry => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>\${entry.name}</td>
+            <td>\${entry.email}</td>
+            <td>\${entry.score} / \${entry.total}</td>
+            <td>\${new Date(entry.date).toLocaleString()}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      });
+  </script>
+</body>
+</html>
