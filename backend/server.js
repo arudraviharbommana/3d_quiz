@@ -24,7 +24,7 @@ if (!fs.existsSync(scoresFile)) {
 
 // POST: Save player score
 app.post('/submit', (req, res) => {
-  const { name, email, score, total, date } = req.body;
+  const { name, score, total, date } = req.body;
   if (!name || !email || score === undefined || total === undefined) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
