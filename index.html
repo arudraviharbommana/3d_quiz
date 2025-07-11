@@ -1,17 +1,43 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>🎬 Cine World - Welcome</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .button-group button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #ffd700;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .button-group button:hover {
+      transform: scale(1.05);
+    }
+  </style>
 </head>
 <body>
   <div class="overlay">
     <div class="welcome-box">
       <h1>🎥 Vihar's Cine Square</h1>
       <input type="text" id="username" placeholder="Enter your name" />
-      <button onclick="startQuiz()">Start Quiz</button>
+      <div class="button-group">
+        <button onclick="startQuiz()">🎮 Start Quiz</button>
+        <button onclick="viewScoreboard()">📊 View Scoreboard</button>
+      </div>
       <p id="error" class="error-msg"></p>
     </div>
   </div>
@@ -26,6 +52,11 @@
       sessionStorage.setItem("username", name);
       window.location.href = "quiz.html";
     }
+
+    function viewScoreboard() {
+      window.location.href = "scoreboard.html";
+    }
   </script>
 </body>
 </html>
+
