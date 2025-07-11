@@ -29,7 +29,7 @@ app.post('/submit', (req, res) => {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  const newEntry = { name, email, score, total, date: date || new Date().toISOString() };
+  const newEntry = { name, score, total, date: date || new Date().toISOString() };
   const existing = JSON.parse(fs.readFileSync(scoresFile));
   existing.push(newEntry);
   fs.writeFileSync(scoresFile, JSON.stringify(existing, null, 2));
