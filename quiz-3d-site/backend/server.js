@@ -3,13 +3,19 @@ const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
 
-const app = express();
+const app = express(); // ✅ make sure this comes before app.get()
+
 const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
 
 const scoresFile = path.join(__dirname, 'data', 'scores.json');
+
+// Optional: test root route
+app.get('/', (req, res) => {
+  res.send('🎉 Quiz backend is running!');
+});
 
 // Ensure scores file exists
 if (!fs.existsSync(scoresFile)) {
