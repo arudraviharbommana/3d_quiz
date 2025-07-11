@@ -115,6 +115,30 @@ function submitQuiz() {
 
   sessionStorage.setItem("score", score);
   sessionStorage.setItem("results", JSON.stringify(results));
+
+  // ✅ Get name and email from sessionStorage
+  const name = sessionStorage.getItem("username");
+  const email = sessionStorage.getItem("email");
+
+  // ✅ Send score to backend
+  fetch("https://quiz-backend.onrender.com/submit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, score })
+  })
+    .then((res) => res.json())
+    .then(() => {
+      window.location.href = "result.html";
+    })
+    .catch((err) => {
+      console.error("Error submitting score:", err);
+      alert("Failed to submit your score. Try again later.");
+    });
+}
+
+
+  sessionStorage.setItem("score", score);
+  sessionStorage.setItem("results", JSON.stringify(results));
   window.location.href = "result.html";
 }
 
