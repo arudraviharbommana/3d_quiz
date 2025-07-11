@@ -35,6 +35,21 @@
     tr:hover {
       background-color: #333;
     }
+    .btn-home {
+      margin-top: 2rem;
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background: #ffd700;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .btn-home:hover {
+      transform: scale(1.05);
+    }
   </style>
 </head>
 <body>
@@ -43,30 +58,32 @@
     <thead>
       <tr>
         <th>Name</th>
-        <th>Email</th>
         <th>Score</th>
       </tr>
     </thead>
     <tbody id="scoreboardBody">
-      <tr><td colspan="3">Loading...</td></tr>
+      <tr><td colspan="2">Loading...</td></tr>
     </tbody>
   </table>
+
+  <div>
+    <button class="btn-home" onclick="goHome()">🏠 Home</button>
+  </div>
 
   <script>
     fetch("https://quiz-backend.onrender.com/scores")
       .then(res => res.json())
       .then(data => {
         const tbody = document.getElementById("scoreboardBody");
-        tbody.innerHTML = ""; // Clear existing rows
+        tbody.innerHTML = "";
 
         if (data.length === 0) {
-          tbody.innerHTML = "<tr><td colspan='3'>No scores yet.</td></tr>";
+          tbody.innerHTML = "<tr><td colspan='2'>No scores yet.</td></tr>";
         } else {
           data.forEach(entry => {
             const row = document.createElement("tr");
             row.innerHTML = `
               <td>${entry.name}</td>
-              <td>${entry.email}</td>
               <td>${entry.score}</td>
             `;
             tbody.appendChild(row);
@@ -75,8 +92,12 @@
       })
       .catch(err => {
         console.error("Failed to load scores:", err);
-        document.getElementById("scoreboardBody").innerHTML = "<tr><td colspan='3'>Error loading scores.</td></tr>";
+        document.getElementById("scoreboardBody").innerHTML = "<tr><td colspan='2'>Error loading scores.</td></tr>";
       });
+
+    function goHome() {
+      window.location.href = "index.html";
+    }
   </script>
 </body>
 </html>
