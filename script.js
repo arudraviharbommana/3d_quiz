@@ -116,7 +116,7 @@ function submitQuiz() {
   const name = sessionStorage.getItem("username");
 
   // ✅ Updated payload includes total
-  fetch("https://quiz-backend.onrender.com/submit", {
+ fetch("https://quiz-backend-mpyf.onrender.com/submit", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, score, total: questions.length })
