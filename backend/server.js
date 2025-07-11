@@ -68,5 +68,5 @@ app.get('/scores', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}`);
+  console.log(`✅ Server running at https://quiz-backend-mpyf.onrender.com`);
 });
