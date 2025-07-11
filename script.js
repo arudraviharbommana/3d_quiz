@@ -113,21 +113,18 @@ function submitQuiz() {
     });
   }
 
-  sessionStorage.setItem("score", score);
-  sessionStorage.setItem("results", JSON.stringify(results));
-
-  // ✅ Get name and email from sessionStorage
   const name = sessionStorage.getItem("username");
-  const email = sessionStorage.getItem("email");
 
-  // ✅ Send score to backend
+  // Send score to backend
   fetch("https://quiz-backend.onrender.com/submit", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, email, score })
+    body: JSON.stringify({ name, score })
   })
     .then((res) => res.json())
     .then(() => {
+      sessionStorage.setItem("score", score);
+      sessionStorage.setItem("results", JSON.stringify(results));
       window.location.href = "result.html";
     })
     .catch((err) => {
@@ -136,18 +133,12 @@ function submitQuiz() {
     });
 }
 
-
-  sessionStorage.setItem("score", score);
-  sessionStorage.setItem("results", JSON.stringify(results));
-  window.location.href = "result.html";
-}
-
 renderQuestion();
 
 // ===== THREE.JS ANIMATED STARFIELD BACKGROUND =====
 const canvas = document.querySelector("#quizCanvas");
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.z = 5;
 
 const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
@@ -183,4 +174,3 @@ window.addEventListener("resize", () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
-
