@@ -115,11 +115,11 @@ function submitQuiz() {
 
   const name = sessionStorage.getItem("username");
 
-  // Send score to backend
+  // ✅ Updated payload includes total
   fetch("https://quiz-backend.onrender.com/submit", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, score })
+    body: JSON.stringify({ name, score, total: questions.length })
   })
     .then((res) => res.json())
     .then(() => {
