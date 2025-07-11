@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🎉 Quiz Results</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: url("background.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+    }
+
+    .overlay {
+      background: rgba(0, 0, 0, 0.6);
+      min-height: 100vh;
+      padding: 50px 20px;
+    }
+
+    .result-box {
+      max-width: 800px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.7);
+    }
+
+    h2, h3 {
+      text-align: center;
+    }
+
+    .answers {
+      margin-top: 30px;
+    }
+
+    .answers .qa {
+      margin-bottom: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .correct {
+      color: #90ee90;
+    }
+
+    .wrong {
+      color: #ff6b6b;
+    }
+
+    .buttons {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .buttons button {
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background: #ffd700;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <div class="result-box">
+      <h2>🎯 Your Score: <span id="scoreDisplay"></span>/10</h2>
+      <div class="answers" id="answers"></div>
+      <div class="buttons">
+        <button onclick="goHome()">🏠 Home</button>
+        <button onclick="viewAgain()">🔁 Retry</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const score = sessionStorage.getItem("score");
+    const results = JSON.parse(sessionStorage.getItem("results"));
+    document.getElementById("scoreDisplay").innerText = score;
+
+    const answersDiv = document.getElementById("answers");
+    results.forEach((res, index) => {
+      const block = document.createElement("div");
+      block.classList.add("qa");
+
+      block.innerHTML = `
+        <h4>Q${index + 1}. ${res.question}</h4>
+        <p><strong>Your Answer:</strong> <span class="\${res.isCorrect ? 'correct' : 'wrong'}">\${res.selected.join(", ") || 'None'}</span></p>
+        <p><strong>Correct Answer:</strong> \${res.correct.join(", ")}</p>
+      `;
+
+      answersDiv.appendChild(block);
+    });
+
+    function goHome() {
+      sessionStorage.clear();
+      window.location.href = "index.html";
+    }
+
+    function viewAgain() {
+      sessionStorage.removeItem("score");
+      sessionStorage.removeItem("results");
+      window.location.href = "quiz.html";
+    }
+  </script>
+</body>
+</html>

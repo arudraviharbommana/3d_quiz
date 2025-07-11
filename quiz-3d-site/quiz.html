@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🎬 3D Movie Quiz</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    canvas#quizCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .quiz-container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .quiz-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 700px;
+      width: 90%;
+      color: white;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+      text-align: center;
+    }
+
+    .quiz-box h2 {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+
+    .quiz-box .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .quiz-box .options button {
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      background: #eee;
+      color: #000;
+      cursor: pointer;
+    }
+
+    .quiz-box .options button.selected {
+      background-color: #ffd700;
+    }
+
+    .quiz-box .nav-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .quiz-box .nav-buttons button {
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      background-color: #00f2fe;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="quizCanvas"></canvas>
+
+  <div class="quiz-container">
+    <div class="quiz-box">
+      <h2 id="quiz-title">Loading...</h2>
+      <div class="options" id="options"></div>
+      <div class="nav-buttons">
+        <button onclick="rotateLeft()">⟵ Prev</button>
+        <button onclick="rotateRight()">Next ⟶</button>
+        <button id="submitBtn" onclick="submitQuiz()" style="display: none;">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,31 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🎬 Movie Quiz - Welcome</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="overlay">
+    <div class="welcome-box">
+      <h1>🎥 Movie Mania Quiz</h1>
+      <input type="text" id="username" placeholder="Enter your name" />
+      <button onclick="startQuiz()">Start Quiz</button>
+      <p id="error" class="error-msg"></p>
+    </div>
+  </div>
+
+  <script>
+    function startQuiz() {
+      const name = document.getElementById("username").value.trim();
+      if (!name) {
+        document.getElementById("error").innerText = "Please enter your name.";
+        return;
+      }
+      sessionStorage.setItem("username", name);
+      window.location.href = "quiz.html";
+    }
+  </script>
+</body>
+</html>
