@@ -1,0 +1,651 @@
+// =========================
+// QUIZ DATA & CONFIGURATION
+// =========================
+const questions = [
+  {
+    question: "Which wood do I like the most?",
+    options: { A: "Kolly wood (Tamil)", B: "Tollywood (Telugu)", C: "Sandalwood (Kannada)", D: "Bollywood (Hindi)" },
+    correct: ["A", "B"]
+  },
+  {
+    question: "Who is my favourite director?",
+    options: { A: "Rajamouli", B: "Puri Jagannadh", C: "Trivikram", D: "Mani Ratnam" },
+    correct: ["D"]
+  },
+  {
+    question: "My favourite genre?",
+    options: { A: "Romantic comedy", B: "Suspense thriller", C: "Horror", D: "Periodic" },
+    correct: ["B"]
+  },
+  {
+    question: "My favourite Hero?",
+    options: { A: "Allu Arjun", B: "NTR", C: "Rajnikanth", D: "Dhanush" },
+    correct: ["C"]
+  },
+  {
+    question: "My Favourite comedian?",
+    options: { A: "Ali", B: "Brahmanandam", C: "Vadivelu", D: "Vivekanandan" },
+    correct: ["D"]
+  },
+  {
+    question: "Whose dance style do I love to dup?",
+    options: { A: "Jani master", B: "Sekhar master", C: "NTR", D: "Allu Arjun" },
+    correct: ["A"]
+  },
+  {
+    question: "What's the latest film that I have enjoyed?",
+    options: { A: "Kuberaa", B: "Daaku Maharaj", C: "HIT-3", D: "Pushpa-2" },
+    correct: ["C", "D"]
+  },
+  {
+    question: "Which film would I like to recommend you to watch?",
+    options: { A: "Dalapathi", B: "Baasha", C: "Mahanadi", D: "Nayakudu" },
+    correct: ["A"]
+  },
+  {
+    question: "My favourite Music album ____.",
+    options: { A: "Remo", B: "Gunturu Kaaram", C: "Pushpa", D: "Petta" },
+    correct: ["B"]
+  },
+  {
+    question: "Something makes me settle____.",
+    options: { A: "Dance", B: "Writing", C: "Music", D: "Food" },
+    correct: ["C", "D"]
+  }
+];
+
+// =========================
+// QUIZ STATE MANAGEMENT
+// =========================
+let currentQuestion = 0;
+let selectedAnswers = [];
+let quizData = {
+  name: '',
+  email: '',
+  score: 0,
+  total: questions.length,
+  results: [],
+  date: ''
+};
+
+// =========================
+// UTILITY FUNCTIONS
+// =========================
+function log(message, data = '') {
+  console.log(`🎬 [QUIZ] ${message}`, data);
+}
+
+function showMessage(element, message, type = 'error') {
+  if (element) {
+    element.textContent = message;
+    element.className = type === 'success' ? 'success-msg' : 'error-msg';
+  }
+}
+
+function showResultMessage(message, type) {
+  const resultBox = document.querySelector(".result-box");
+  if (!resultBox) return;
+  
+  const existingMsg = resultBox.querySelector('.result-message');
+  if (existingMsg) existingMsg.remove();
+  
+  const msgElement = document.createElement("div");
+  msgElement.className = 'result-message';
+  msgElement.style.cssText = `
+    background: ${type === 'success' ? '#4CAF50' : type === 'warning' ? '#ff9800' : '#f44336'};
+    color: white; padding: 10px; margin: 10px 0; border-radius: 5px; text-align: center;
+  `;
+  msgElement.textContent = message;
+  resultBox.prepend(msgElement);
+}
+
+// =========================
+// LOCAL STORAGE MANAGEMENT
+// =========================
+function saveScoreToLocal(scoreData) {
+  try {
+    let scores = JSON.parse(localStorage.getItem('movieQuizScores') || '[]');
+    scores.push(scoreData);
+    scores.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return new Date(b.date) - new Date(a.date);
+    });
+    localStorage.setItem('movieQuizScores', JSON.stringify(scores));
+    log('Score saved to localStorage:', scoreData);
+    return true;
+  } catch (error) {
+    log('Error saving to localStorage:', error);
+    return false;
+  }
+}
+
+function getScoresFromLocal() {
+  try {
+    return JSON.parse(localStorage.getItem('movieQuizScores') || '[]');
+  } catch (error) {
+    log('Error loading from localStorage:', error);
+    return [];
+  }
+}
+
+function clearLocalScores() {
+  localStorage.removeItem('movieQuizScores');
+  log('Local scores cleared');
+}
+
+// =========================
+// INDEX PAGE FUNCTIONS
+// =========================
+function startQuiz() {
+  log('Starting quiz...');
+  
+  const nameInput = document.getElementById("username");
+  const emailInput = document.getElementById("email");
+  const errorElement = document.getElementById("error");
+  
+  if (!nameInput || !emailInput) {
+    log('Name or email input not found');
+    return;
+  }
+  
+  const name = nameInput.value.trim();
+  const email = emailInput.value.trim();
+  
+  if (!name) {
+    showMessage(errorElement, "Please enter your name.");
+    return;
+  }
+  
+  if (!email) {
+    showMessage(errorElement, "Please enter your email.");
+    return;
+  }
+  
+  // Store user data
+  quizData.name = name;
+  quizData.email = email;
+  quizData.date = new Date().toISOString();
+  
+  // Save to sessionStorage
+  sessionStorage.setItem("name", name);
+  sessionStorage.setItem("email", email);
+  sessionStorage.setItem("quizData", JSON.stringify(quizData));
+  
+  log('User data stored:', { name, email });
+  
+  // Navigate to quiz
+  window.location.href = "quiz.html";
+}
+
+function viewScoreboard() {
+  log('Navigating to scoreboard...');
+  window.location.href = "scoreboard.html";
+}
+
+function initializeIndexPage() {
+  const startBtn = document.getElementById("startQuizBtn");
+  const scoreboardBtn = document.getElementById("viewScoreboardBtn");
+  
+  if (startBtn) {
+    startBtn.addEventListener('click', startQuiz);
+    log('Start Quiz button initialized');
+  }
+  
+  if (scoreboardBtn) {
+    scoreboardBtn.addEventListener('click', viewScoreboard);
+    log('View Scoreboard button initialized');
+  }
+}
+
+// =========================
+// QUIZ PAGE FUNCTIONS
+// =========================
+function renderQuestion() {
+  if (!questions || currentQuestion >= questions.length) {
+    log('No questions or end of quiz reached');
+    return;
+  }
+  
+  const questionElement = document.getElementById("questionText");
+  const optionsElement = document.getElementById("optionsContainer");
+  const titleElement = document.getElementById("questionTitle");
+  const progressElement = document.getElementById("progressFill");
+  
+  if (!questionElement || !optionsElement) {
+    log('Quiz elements not found on page');
+    return;
+  }
+  
+  const question = questions[currentQuestion];
+  
+  // Update question title and progress
+  if (titleElement) titleElement.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+  if (progressElement) progressElement.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+  
+  // Display question
+  questionElement.textContent = question.question;
+  
+  // Display options
+  optionsElement.innerHTML = '';
+  Object.entries(question.options).forEach(([key, value]) => {
+    const optionDiv = document.createElement("div");
+    optionDiv.className = "option";
+    
+    optionDiv.innerHTML = `
+      <input type="checkbox" id="option${key}" value="${key}" style="display: none;">
+      <label for="option${key}">${key}. ${value}</label>
+    `;
+    
+    // Add click handler for the entire div
+    optionDiv.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const checkbox = this.querySelector('input');
+      
+      // Allow multiple selections - just toggle this option
+      if (checkbox) {
+        checkbox.checked = !checkbox.checked;
+        
+        // Update visual state
+        if (checkbox.checked) {
+          this.classList.add('selected');
+        } else {
+          this.classList.remove('selected');
+        }
+      }
+      
+      enableNextButton();
+    });
+    
+    optionsElement.appendChild(optionDiv);
+  });
+  
+  log(`Rendered question ${currentQuestion + 1}:`, question.question);
+  
+  // Disable next button initially
+  const prevBtn = document.getElementById("prevBtn");
+  if (prevBtn) prevBtn.disabled = currentQuestion === 0;
+}
+
+function updateSelectedState() {
+  const selected = selectedAnswers[currentQuestion] || [];
+
+  const options = document.querySelectorAll('#optionsContainer .option');
+  options.forEach(option => {
+    const checkbox = option.querySelector('input[type="checkbox"]');
+    if (checkbox) {
+      checkbox.checked = selected.includes(checkbox.value);
+      if (checkbox.checked) {
+        option.classList.add('selected');
+      } else {
+        option.classList.remove('selected');
+      }
+    }
+  });
+
+  enableNextButton();
+}
+
+function updateOptionStyles() {
+  const options = document.querySelectorAll('#optionsContainer .option');
+  options.forEach(option => {
+    const checkbox = option.querySelector('input[type="checkbox"]');
+    if (checkbox.checked) {
+      option.classList.add('selected');
+    } else {
+      option.classList.remove('selected');
+    }
+  });
+}
+
+function enableNextButton() {
+  const nextBtn = document.getElementById("nextBtn");
+  const checkedBoxes = document.querySelectorAll('#optionsContainer input[type="checkbox"]:checked');
+  
+  if (nextBtn) {
+    nextBtn.disabled = checkedBoxes.length === 0;
+    nextBtn.style.opacity = checkedBoxes.length === 0 ? '0.5' : '1';
+  }
+}
+
+function prevQuestion() {
+  if (currentQuestion > 0) {
+    currentQuestion--;
+    renderQuestion();
+    updateSelectedState(); // Highlight previously selected answers
+  }
+}
+
+function nextQuestion() {
+  log(`Processing question ${currentQuestion + 1}`);
+  
+  // Get selected answers
+  const selected = [];
+  const checkboxes = document.querySelectorAll('#optionsContainer input[type="checkbox"]:checked');
+  checkboxes.forEach(cb => selected.push(cb.value));
+  
+  if (selected.length === 0) {
+    alert('Please select at least one answer before proceeding.');
+    return;
+  }
+  
+  selectedAnswers[currentQuestion] = selected;
+  log('Selected answers:', selected);
+  
+  currentQuestion++;
+  
+  if (currentQuestion < questions.length) {
+    renderQuestion();
+  } else {
+    finishQuiz();
+  }
+}
+
+function finishQuiz() {
+  log('Finishing quiz and calculating results...');
+  
+  // Calculate score and results
+  quizData.score = 0;
+  quizData.results = [];
+  
+  for (let i = 0; i < questions.length; i++) {
+    const correct = questions[i].correct.sort();
+    const selected = (selectedAnswers[i] || []).sort();
+    const isCorrect = JSON.stringify(correct) === JSON.stringify(selected);
+    
+    if (isCorrect) quizData.score++;
+    
+    quizData.results.push({
+      question: questions[i].question,
+      selected,
+      correct,
+      isCorrect
+    });
+  }
+  
+  // Save complete quiz data
+  sessionStorage.setItem("quizData", JSON.stringify(quizData));
+  sessionStorage.setItem("score", quizData.score.toString());
+  sessionStorage.setItem("results", JSON.stringify(quizData.results));
+  
+  log('Quiz completed! Final data:', quizData);
+  
+  // Navigate to results
+  window.location.href = "result.html";
+}
+
+// =========================
+// RESULT PAGE FUNCTIONS
+// =========================
+function displayResults() {
+  log('Displaying results...');
+  
+  // Load quiz data
+  const storedData = sessionStorage.getItem("quizData");
+  if (storedData) {
+    quizData = JSON.parse(storedData);
+  } else {
+    // Fallback to individual items
+    quizData.score = parseInt(sessionStorage.getItem("score") || "0");
+    quizData.results = JSON.parse(sessionStorage.getItem("results") || "[]");
+    quizData.name = sessionStorage.getItem("name") || "";
+    quizData.email = sessionStorage.getItem("email") || "";
+  }
+  
+  log('Loaded quiz data:', quizData);
+  
+  // Display score
+  const scoreElement = document.getElementById("scoreDisplay");
+  if (scoreElement) {
+    scoreElement.textContent = `${quizData.score}/${quizData.total}`;
+  }
+  
+  // Display detailed results
+  const answersDiv = document.getElementById("answers");
+  if (answersDiv && quizData.results) {
+    answersDiv.innerHTML = '';
+    quizData.results.forEach((result, index) => {
+      const block = document.createElement("div");
+      block.classList.add("qa");
+      block.innerHTML = `
+        <h4>Q${index + 1}. ${result.question}</h4>
+        <p><strong>Your Answer:</strong> 
+  <span class="${result.isCorrect ? 'correct' : 'wrong'}">
+    ${(result.selected || []).map(opt => questions[index].options[opt]).join(", ") || 'None'}
+  </span>
+</p>
+<p><strong>Correct Answer:</strong> 
+  ${(result.correct || []).map(opt => questions[index].options[opt]).join(", ")}
+</p>
+
+      `;
+      answersDiv.appendChild(block);
+    });
+  }
+  
+  // Save score to localStorage
+  saveScore();
+}
+
+function saveScore() {
+  if (!quizData.name || !quizData.email) {
+    log('Error: Missing name or email for submission', quizData);
+    showResultMessage('⚠️ Missing name or email for score submission.', 'warning');
+    return;
+  }
+  
+  const scoreData = {
+    name: quizData.name,
+    email: quizData.email,
+    score: quizData.score,
+    total: quizData.total,
+    percentage: Math.round((quizData.score / quizData.total) * 100),
+    date: new Date().toISOString(),
+    timestamp: Date.now()
+  };
+  
+  log('Saving score data:', scoreData);
+  
+  // Save to localStorage
+  const localSaved = saveScoreToLocal(scoreData);
+  
+  if (localSaved) {
+    showResultMessage('✅ Score saved locally!', 'success');
+  } else {
+    showResultMessage('❌ Error saving score locally.', 'error');
+  }
+}
+
+// =========================
+// SCOREBOARD FUNCTIONS
+// =========================
+function loadScoreboard() {
+  log('Loading scoreboard...');
+  
+  const tbody = document.querySelector("#scoreTable tbody");
+  if (!tbody) {
+    log('Scoreboard table not found');
+    return;
+  }
+  
+  // Show loading message
+  tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #ccc;">Loading scores...</td></tr>';
+  
+  try {
+    const scores = getScoresFromLocal();
+    
+    tbody.innerHTML = '';
+    
+    if (scores.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #ccc; font-style: italic;">No scores yet. Be the first to take the quiz!</td></tr>';
+      return;
+    }
+    
+    // Display scores
+    scores.forEach((entry, index) => {
+      const row = document.createElement("tr");
+      const rank = index + 1;
+      const percentage = entry.percentage || Math.round((entry.score / entry.total) * 100);
+      const date = new Date(entry.date).toLocaleString();
+      
+      row.innerHTML = `
+        <td>${rank}. ${entry.name}</td>
+        <td>${entry.email}</td>
+        <td><strong>${entry.score}/${entry.total}</strong> (${percentage}%)</td>
+        <td>${date}</td>
+      `;
+      
+      // Highlight top 3
+      if (rank === 1) row.style.background = 'rgba(255, 215, 0, 0.2)'; // Gold
+      else if (rank === 2) row.style.background = 'rgba(192, 192, 192, 0.2)'; // Silver  
+      else if (rank === 3) row.style.background = 'rgba(205, 127, 50, 0.2)'; // Bronze
+      
+      tbody.appendChild(row);
+    });
+    
+    log(`Loaded ${scores.length} scores to scoreboard`);
+    
+  } catch (error) {
+    log('Error loading scores:', error);
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #ff6b6b;">Error loading scores. Check console for details.</td></tr>';
+  }
+}
+
+// =========================
+// NAVIGATION FUNCTIONS
+// =========================
+function goHome() {
+  log('Navigating to home page');
+  sessionStorage.clear();
+  window.location.href = "index.html";
+}
+
+function viewAgain() {
+  log('Restarting quiz');
+  // Keep user data but reset quiz state
+  const userData = {
+    name: quizData.name,
+    email: quizData.email
+  };
+  sessionStorage.clear();
+  sessionStorage.setItem("name", userData.name);
+  sessionStorage.setItem("email", userData.email);
+  sessionStorage.setItem("quizData", JSON.stringify({
+    name: userData.name,
+    email: userData.email,
+    score: 0,
+    total: questions.length,
+    results: [],
+    date: new Date().toISOString()
+  }));
+  window.location.href = "quiz.html";
+}
+
+// =========================
+// PAGE INITIALIZATION
+// =========================
+document.addEventListener('DOMContentLoaded', function() {
+  const currentPage = window.location.pathname.split('/').pop();
+  log('Page loaded:', currentPage);
+  
+  // Initialize based on current page
+  switch(currentPage) {
+    case 'index.html':
+    case '':
+      // Initialize index page buttons
+      initializeIndexPage();
+      break;
+      
+    case 'quiz.html':
+      // Load user data
+      const storedData = sessionStorage.getItem("quizData");
+      if (storedData) {
+        quizData = JSON.parse(storedData);
+        log('Loaded quiz data for user:', quizData.name);
+      } else {
+        // If no quiz data, redirect to index
+        log('No quiz data found, redirecting to index');
+        window.location.href = "index.html";
+        return;
+      }
+      
+      // Reset quiz state
+      currentQuestion = 0;
+      selectedAnswers = [];
+      
+      // Render first question
+      renderQuestion();
+      break;
+      
+    case 'result.html':
+      displayResults();
+      break;
+      
+    case 'scoreboard.html':
+      loadScoreboard();
+      break;
+      
+    default:
+      log('Unknown page, checking for index elements...');
+      // Fallback: if we find index page elements, initialize them
+      if (document.getElementById("startQuizBtn")) {
+        initializeIndexPage();
+      }
+  }
+});
+
+// =========================
+// 3D BACKGROUND (QUIZ PAGE)
+// =========================
+if (typeof THREE !== 'undefined' && document.getElementById('quizCanvas')) {
+  const canvas = document.querySelector("#quizCanvas");
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera.position.z = 5;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const geometry = new THREE.SphereGeometry(0.03, 8, 8);
+  const material = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xaaaaaa });
+
+  for (let i = 0; i < 200; i++) {
+    const star = new THREE.Mesh(geometry, material);
+    star.position.set(
+      (Math.random() - 0.5) * 20,
+      (Math.random() - 0.5) * 20,
+      (Math.random() - 0.5) * 20
+    );
+    scene.add(star);
+  }
+
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+  scene.add(ambientLight);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    scene.rotation.x += 0.0008;
+    scene.rotation.y += 0.0005;
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+}
+
+// Debug functions
+function viewStoredScores() {
+  const scores = getScoresFromLocal();
+  console.table(scores);
+  return scores;
+}
+
+function clearAllScores() {
+  clearLocalScores();
+  console.log('All scores cleared from localStorage');
+}

@@ -81,18 +81,21 @@
 
   <div class="quiz-container">
     <div class="quiz-box">
-      <h2 id="quiz-title">Loading...</h2>
-      <div class="options" id="options"></div>
+      <h2 id="questionTitle">Question 1 of 10</h2>
+      <div class="progress-bar">
+        <div id="progressFill" style="width: 10%;"></div>
+      </div>
+      <h3 id="questionText">Loading question...</h3>
+      <div id="optionsContainer"></div>
       <div class="nav-buttons">
-        <button onclick="rotateLeft()">⟵ Prev</button>
-        <button onclick="rotateRight()">Next ⟶</button>
-        <button id="submitBtn" onclick="submitQuiz()" style="display: none;">Submit</button>
+        <button id="prevBtn" onclick="prevQuestion()">⟵ Previous</button>
+        <button id="nextBtn" onclick="nextQuestion()" disabled>Next ⟶</button>
+
       </div>
     </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="script.js"></script>
+  <script src="script_new.js"></script>
 </body>
 </html>
-

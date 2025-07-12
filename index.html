@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,25 +6,17 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="overlay">
-    <div class="welcome-box">
+  <div class="welcome-page">
+    <div class="welcome-container">
       <h1>🎥 Vihar's Cine Square</h1>
       <input type="text" id="username" placeholder="Enter your name" />
-      <button onclick="startQuiz()">Start Quiz</button>
+      <input type="email" id="email" placeholder="Enter your email" />
+      <button id="startQuizBtn">Start Quiz</button>
+      <button id="viewScoreboardBtn">View Scoreboard</button>
       <p id="error" class="error-msg"></p>
     </div>
   </div>
 
-  <script>
-    function startQuiz() {
-      const name = document.getElementById("username").value.trim();
-      if (!name) {
-        document.getElementById("error").innerText = "Please enter your name.";
-        return;
-      }
-      sessionStorage.setItem("username", name);
-      window.location.href = "quiz.html";
-    }
-  </script>
+  <script src="script_new.js"></script>
 </body>
 </html>

@@ -50,6 +50,9 @@
 <body>
   <div class="board">
     <h2>🏆 Quiz Scoreboard</h2>
+    <div style="text-align: center; margin-bottom: 20px;">
+      <button onclick="goHome()" style="padding: 10px 20px; background: #ffd700; color: #000; border: none; border-radius: 10px; cursor: pointer; font-weight: bold;">🏠 Back to Home</button>
+    </div>
     <table id="scoreTable">
       <thead>
         <tr>
@@ -65,22 +68,6 @@
     </table>
   </div>
 
-  <script>
-    fetch("http://localhost:3000/scores")
-      .then(res => res.json())
-      .then(data => {
-        const tbody = document.querySelector("#scoreTable tbody");
-        data.reverse().forEach(entry => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>\${entry.name}</td>
-            <td>\${entry.email}</td>
-            <td>\${entry.score} / \${entry.total}</td>
-            <td>\${new Date(entry.date).toLocaleString()}</td>
-          `;
-          tbody.appendChild(row);
-        });
-      });
-  </script>
+  <script src="script_new.js"></script>
 </body>
 </html>

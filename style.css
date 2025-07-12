@@ -1,77 +1,168 @@
-/* Set full-screen background */
 body {
   margin: 0;
   padding: 0;
+  font-family: 'Segoe UI', sans-serif;
   background: url("background.jpg") no-repeat center center fixed;
   background-size: cover;
-  font-family: 'Segoe UI', sans-serif;
-  height: 100vh;
-  overflow: hidden;
+  color: white;
 }
 
-/* Transparent dark overlay for contrast */
-.overlay {
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* dark film-like overlay */
+input, button {
+  outline: none;
+  font-family: inherit;
+}
+
+.welcome-page {
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100vh;
+  background-size: cover;
 }
 
-/* Welcome box with cinematic glass look */
-.welcome-box {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+.welcome-container {
+  background: rgba(255, 255, 255, 0.08);
   padding: 40px;
   border-radius: 20px;
-  color: #fff;
-  box-shadow: 0 0 30px rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 25px rgba(0,0,0,0.5);
   text-align: center;
-  width: 90%;
-  max-width: 400px;
 }
 
-.welcome-box h1 {
+.welcome-container h1 {
   margin-bottom: 20px;
-  font-size: 2em;
+  color: #fff;
 }
 
-input {
-  width: 90%;
+.welcome-container input {
   padding: 12px;
-  margin: 10px 0;
-  border: none;
+  width: 100%;
+  max-width: 300px;
   border-radius: 10px;
+  border: none;
+  margin-bottom: 20px;
   font-size: 16px;
 }
 
-button {
+.welcome-container button {
   padding: 12px 24px;
   background: #ffd700;
-  color: #000;
   border: none;
+  border-radius: 10px;
   font-weight: bold;
   font-size: 16px;
-  border-radius: 10px;
   cursor: pointer;
 }
 
-button:hover {
-  background: #ffcc00;
-}
-
 .error-msg {
-  margin-top: 10px;
   color: #ff6b6b;
   font-size: 14px;
+  margin-top: 10px;
 }
 
-body, html {
+/* Quiz page specific styles */
+.quiz-container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.quiz-box {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 700px;
+  width: 90%;
+  color: white;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+.quiz-box h2, .quiz-box h3 {
+  margin-bottom: 20px;
+}
+
+#optionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.option {
+  background: #ffffff;
+  color: #000000;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  font-size: 16px;
+}
+
+.option:hover {
+  border-color: #ffd700;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+}
+
+.option.selected {
+  background: #ffd700;
+  border-color: #ffcc00;
+  font-weight: bold;
+}
+
+.option input[type="checkbox"] {
+  display: none;
+}
+
+.option label {
+  cursor: pointer;
+  width: 100%;
+  display: block;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 5px;
+  background: rgba(255,255,255,0.2);
+  margin: 10px 0;
+  border-radius: 3px;
+}
+
+#progressFill {
   height: 100%;
-  overflow-y: auto; /* Enable vertical scroll */
+  background: #ffd700;
+  border-radius: 3px;
+  transition: width 0.3s ease;
 }
-.overlay {
-  overflow-y: auto;
-  max-height: 100vh;
+
+.nav-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
 }
+
+.nav-buttons button {
+  background: #00f2fe;
+  color: black;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.nav-buttons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
