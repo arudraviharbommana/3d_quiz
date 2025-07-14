@@ -71,44 +71,23 @@
 <body>
   <div class="overlay">
     <div class="result-box">
-      <h2>🎯 Your Score: <span id="scoreDisplay"></span>/10</h2>
+      <h2>🎯 Your Score: <span id="scoreDisplay"></span></h2>
       <div class="answers" id="answers"></div>
       <div class="buttons">
         <button onclick="goHome()">🏠 Home</button>
         <button onclick="viewAgain()">🔁 Retry</button>
+        <button onclick="viewScoreboard()">🏆 Scoreboard</button>
       </div>
     </div>
   </div>
 
-  <script>
-    const score = sessionStorage.getItem("score");
-    const results = JSON.parse(sessionStorage.getItem("results"));
-    document.getElementById("scoreDisplay").innerText = score;
-
-    const answersDiv = document.getElementById("answers");
-    results.forEach((res, index) => {
-      const block = document.createElement("div");
-      block.classList.add("qa");
-
-      block.innerHTML = `
-        <h4>Q${index + 1}. ${res.question}</h4>
-        <p><strong>Your Answer:</strong> <span class="\${res.isCorrect ? 'correct' : 'wrong'}">\${res.selected.join(", ") || 'None'}</span></p>
-        <p><strong>Correct Answer:</strong> \${res.correct.join(", ")}</p>
-      `;
-
-      answersDiv.appendChild(block);
-    });
-
-    function goHome() {
-      sessionStorage.clear();
-      window.location.href = "index.html";
-    }
-
-    function viewAgain() {
-      sessionStorage.removeItem("score");
-      sessionStorage.removeItem("results");
-      window.location.href = "quiz.html";
-    }
-  </script>
+  <!-- Configuration -->
+  <script src="config.js"></script>
+  <!-- Supabase JavaScript Library -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Supabase client configuration -->
+  <script src="supabase-client.js"></script>
+  <!-- Main application script -->
+  <script src="script_new.js"></script>
 </body>
 </html>

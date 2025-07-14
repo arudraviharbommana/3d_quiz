@@ -100,18 +100,33 @@ function showResultMessage(message, type) {
 }
 
 // =========================
-// LOCAL STORAGE MANAGEMENT
+// API CONFIGURATION
+// =========================
+const API_BASE_URL = 'http://localhost:3000'; // Backend server URL (fallback)
+const USE_SUPABASE = true; // Set to true to use Supabase, false for local server
+
+// =========================
+// LOCAL STORAGE MANAGEMENT (Fallback)
 // =========================
 function saveScoreToLocal(scoreData) {
   try {
     let scores = JSON.parse(localStorage.getItem('movieQuizScores') || '[]');
+    
+    // Remove any existing score for the same email (case-insensitive)
+    const normalizedEmail = scoreData.email.toLowerCase().trim();
+    scores = scores.filter(score => score.email.toLowerCase().trim() !== normalizedEmail);
+    
+    // Add the new score
     scores.push(scoreData);
+    
+    // Sort by score (highest first), then by date (most recent first)
     scores.sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
       return new Date(b.date) - new Date(a.date);
     });
+    
     localStorage.setItem('movieQuizScores', JSON.stringify(scores));
-    log('Score saved to localStorage:', scoreData);
+    log('Score saved to localStorage (replaced existing):', scoreData);
     return true;
   } catch (error) {
     log('Error saving to localStorage:', error);
@@ -128,9 +143,83 @@ function getScoresFromLocal() {
   }
 }
 
-function clearLocalScores() {
-  localStorage.removeItem('movieQuizScores');
-  log('Local scores cleared');
+// =========================
+// BACKEND API FUNCTIONS
+// =========================
+async function saveScoreToServer(scoreData) {
+  // Try Supabase first if enabled
+  if (USE_SUPABASE && typeof supabaseClient !== 'undefined') {
+    console.log('🚀 Using Supabase for score storage');
+    const result = await supabaseClient.saveScore(scoreData);
+    return result.success || false;
+  }
+  
+  // Fallback to local server
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/scores`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(scoreData)
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      log('Score saved to server:', scoreData);
+      return true;
+    } else {
+      log('Server error saving score:', result.error);
+      return false;
+    }
+  } catch (error) {
+    log('Network error saving score:', error);
+    return false;
+  }
+}
+
+async function getScoresFromServer() {
+  // Try Supabase first if enabled
+  if (USE_SUPABASE && typeof supabaseClient !== 'undefined') {
+    console.log('🚀 Using Supabase for score retrieval');
+    return await supabaseClient.getScores();
+  }
+  
+  // Fallback to local server
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/scores`);
+    const result = await response.json();
+    
+    if (result.success) {
+      log('Scores loaded from server:', result.scores.length);
+      return result.scores;
+    } else {
+      log('Server error loading scores:', result.error);
+      return [];
+    }
+  } catch (error) {
+    log('Network error loading scores:', error);
+    return [];
+  }
+}
+
+async function getUserScores(email) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/scores/${encodeURIComponent(email)}`);
+    const result = await response.json();
+    
+    if (result.success) {
+      log('User scores loaded from server:', result.scores.length);
+      return result.scores;
+    } else {
+      log('Server error loading user scores:', result.error);
+      return [];
+    }
+  } catch (error) {
+    log('Network error loading user scores:', error);
+    return [];
+  }
 }
 
 // =========================
@@ -398,7 +487,7 @@ function displayResults() {
   // Display score
   const scoreElement = document.getElementById("scoreDisplay");
   if (scoreElement) {
-    scoreElement.textContent = `${quizData.score}/${quizData.total}`;
+    scoreElement.textContent = `${quizData.score}/${quizData.total || questions.length}`;
   }
   
   // Display detailed results
@@ -408,17 +497,17 @@ function displayResults() {
     quizData.results.forEach((result, index) => {
       const block = document.createElement("div");
       block.classList.add("qa");
+      
+      // Convert option keys to format: "A. Option Text"
+      const selectedText = (result.selected || []).map(opt => `${opt}. ${questions[index].options[opt] || opt}`).join(", ") || 'None';
+      const correctText = (result.correct || []).map(opt => `${opt}. ${questions[index].options[opt] || opt}`).join(", ");
+      
       block.innerHTML = `
         <h4>Q${index + 1}. ${result.question}</h4>
         <p><strong>Your Answer:</strong> 
-  <span class="${result.isCorrect ? 'correct' : 'wrong'}">
-    ${(result.selected || []).map(opt => questions[index].options[opt]).join(", ") || 'None'}
-  </span>
-</p>
-<p><strong>Correct Answer:</strong> 
-  ${(result.correct || []).map(opt => questions[index].options[opt]).join(", ")}
-</p>
-
+          <span class="${result.isCorrect ? 'correct' : 'wrong'}">${selectedText}</span>
+        </p>
+        <p><strong>Correct Answer:</strong> ${correctText}</p>
       `;
       answersDiv.appendChild(block);
     });
@@ -447,20 +536,37 @@ function saveScore() {
   
   log('Saving score data:', scoreData);
   
-  // Save to localStorage
-  const localSaved = saveScoreToLocal(scoreData);
-  
-  if (localSaved) {
-    showResultMessage('✅ Score saved locally!', 'success');
-  } else {
-    showResultMessage('❌ Error saving score locally.', 'error');
-  }
+  // Try to save to server first, fallback to localStorage
+  saveScoreToServer(scoreData)
+    .then(serverSaved => {
+      if (serverSaved) {
+        showResultMessage('✅ Score saved to global scoreboard!', 'success');
+      } else {
+        // Fallback to localStorage
+        const localSaved = saveScoreToLocal(scoreData);
+        if (localSaved) {
+          showResultMessage('⚠️ Score saved locally (server unavailable)', 'warning');
+        } else {
+          showResultMessage('❌ Error saving score', 'error');
+        }
+      }
+    })
+    .catch(error => {
+      log('Error in saveScore:', error);
+      // Fallback to localStorage
+      const localSaved = saveScoreToLocal(scoreData);
+      if (localSaved) {
+        showResultMessage('⚠️ Score saved locally (server unavailable)', 'warning');
+      } else {
+        showResultMessage('❌ Error saving score', 'error');
+      }
+    });
 }
 
 // =========================
 // SCOREBOARD FUNCTIONS
 // =========================
-function loadScoreboard() {
+async function loadScoreboard() {
   log('Loading scoreboard...');
   
   const tbody = document.querySelector("#scoreTable tbody");
@@ -470,17 +576,28 @@ function loadScoreboard() {
   }
   
   // Show loading message
-  tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #ccc;">Loading scores...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #ccc;">Loading global scores...</td></tr>';
   
   try {
-    const scores = getScoresFromLocal();
+    // Try to load from server first
+    const serverScores = await getScoresFromServer();
+    let scores = [];
+    
+    if (serverScores.length > 0) {
+      scores = serverScores;
+      log('Using server scores:', scores.length);
+    } else {
+      // Fallback to localStorage if server has no scores
+      scores = getScoresFromLocal();
+      log('Using local scores as fallback:', scores.length);
+      
+      if (scores.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #ccc; font-style: italic;">No scores yet. Be the first to take the quiz!</td></tr>';
+        return;
+      }
+    }
     
     tbody.innerHTML = '';
-    
-    if (scores.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #ccc; font-style: italic;">No scores yet. Be the first to take the quiz!</td></tr>';
-      return;
-    }
     
     // Display scores
     scores.forEach((entry, index) => {
@@ -508,7 +625,32 @@ function loadScoreboard() {
     
   } catch (error) {
     log('Error loading scores:', error);
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #ff6b6b;">Error loading scores. Check console for details.</td></tr>';
+    // Final fallback to localStorage
+    const localScores = getScoresFromLocal();
+    if (localScores.length > 0) {
+      tbody.innerHTML = '';
+      localScores.forEach((entry, index) => {
+        const row = document.createElement("tr");
+        const rank = index + 1;
+        const percentage = entry.percentage || Math.round((entry.score / entry.total) * 100);
+        const date = new Date(entry.date).toLocaleString();
+        
+        row.innerHTML = `
+          <td>${rank}. ${entry.name}</td>
+          <td>${entry.email}</td>
+          <td><strong>${entry.score}/${entry.total}</strong> (${percentage}%)</td>
+          <td>${date}</td>
+        `;
+        
+        if (rank === 1) row.style.background = 'rgba(255, 215, 0, 0.2)';
+        else if (rank === 2) row.style.background = 'rgba(192, 192, 192, 0.2)';
+        else if (rank === 3) row.style.background = 'rgba(205, 127, 50, 0.2)';
+        
+        tbody.appendChild(row);
+      });
+    } else {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #ff6b6b;">Error loading scores. Please try again later.</td></tr>';
+    }
   }
 }
 
