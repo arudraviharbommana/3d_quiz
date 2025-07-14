@@ -74,15 +74,19 @@
       text-align: center;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       font-size: 15px;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.9);
+      color: #000;
+      font-weight: 500;
     }
 
     tr:nth-child(even) td {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.95);
+      color: #000;
     }
 
     tr:hover td {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 1);
+      color: #000;
       transform: scale(1.01);
       transition: all 0.2s ease;
     }
@@ -97,27 +101,31 @@
 
     /* Rank styling */
     .rank-1 {
-      background: linear-gradient(135deg, #ffd700, #ffed4e) !important;
-      color: #000;
+      background: linear-gradient(135deg, #ffffff, #f8f9fa) !important;
+      color: #000 !important;
       font-weight: bold;
+      border: 2px solid #ffd700;
     }
 
     .rank-2 {
-      background: linear-gradient(135deg, #c0c0c0, #e8e8e8) !important;
-      color: #000;
+      background: linear-gradient(135deg, #ffffff, #f8f9fa) !important;
+      color: #000 !important;
       font-weight: bold;
+      border: 2px solid #c0c0c0;
     }
 
     .rank-3 {
-      background: linear-gradient(135deg, #cd7f32, #daa520) !important;
-      color: #000;
+      background: linear-gradient(135deg, #ffffff, #f8f9fa) !important;
+      color: #000 !important;
       font-weight: bold;
+      border: 2px solid #cd7f32;
     }
 
     /* Score column styling */
     .score-cell {
       font-weight: bold;
-      color: #ffd700;
+      color: #000 !important;
+      background: #ffffff !important;
     }
 
     /* Mobile responsiveness */
