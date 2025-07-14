@@ -763,13 +763,32 @@ function initializeThreeJSAnimation(canvasId) {
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
   camera.position.z = 5;
 
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+  // Mobile optimization - reduce quality for better performance
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+  
+  const renderer = new THREE.WebGLRenderer({ 
+    canvas, 
+    alpha: true,
+    antialias: !isMobile, // Disable antialiasing on mobile for performance
+    powerPreference: isMobile ? "low-power" : "high-performance"
+  });
+  
+  // Set pixel ratio for mobile devices
+  renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  const geometry = new THREE.SphereGeometry(0.03, 8, 8);
-  const material = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xaaaaaa });
+  // Reduced geometry complexity for mobile
+  const geometry = new THREE.SphereGeometry(0.03, isMobile ? 6 : 8, isMobile ? 6 : 8);
+  const material = new THREE.MeshBasicMaterial({ 
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.8
+  });
 
-  for (let i = 0; i < 200; i++) {
+  // Fewer particles on mobile for better performance
+  const particleCount = isMobile ? 100 : 200;
+  
+  for (let i = 0; i < particleCount; i++) {
     const star = new THREE.Mesh(geometry, material);
     star.position.set(
       (Math.random() - 0.5) * 20,
@@ -779,30 +798,75 @@ function initializeThreeJSAnimation(canvasId) {
     scene.add(star);
   }
 
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
-  scene.add(ambientLight);
+  // Simpler lighting for mobile
+  if (!isMobile) {
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+    scene.add(ambientLight);
+  }
 
-  function animate() {
+  let isAnimating = true;
+  let lastTime = 0;
+  const targetFPS = isMobile ? 30 : 60; // Lower FPS on mobile
+  const interval = 1000 / targetFPS;
+  
+  function animate(currentTime) {
+    if (!isAnimating) return;
+    
     requestAnimationFrame(animate);
-    scene.rotation.x += 0.0008;
-    scene.rotation.y += 0.0005;
+    
+    // Throttle animation for mobile performance
+    if (currentTime - lastTime < interval) return;
+    lastTime = currentTime;
+    
+    scene.rotation.x += isMobile ? 0.0005 : 0.0008;
+    scene.rotation.y += isMobile ? 0.0003 : 0.0005;
     renderer.render(scene, camera);
   }
   animate();
+
+  // Pause animation when page is not visible (mobile battery optimization)
+  document.addEventListener('visibilitychange', () => {
+    isAnimating = !document.hidden;
+    if (isAnimating) animate();
+  });
 
   window.addEventListener("resize", () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
   });
 }
 
 // Initialize animations for all pages
 document.addEventListener('DOMContentLoaded', function() {
+  // Check WebGL support
+  function isWebGLSupported() {
+    try {
+      const canvas = document.createElement('canvas');
+      return !!(window.WebGLRenderingContext && canvas.getContext('webgl'));
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Add fallback for devices without WebGL support
+  if (!isWebGLSupported()) {
+    document.body.classList.add('no-webgl');
+    // Create fallback animation element
+    const fallbackDiv = document.createElement('div');
+    fallbackDiv.className = 'mobile-animation-fallback';
+    document.body.appendChild(fallbackDiv);
+    return;
+  }
+
   // Check which canvas exists and initialize accordingly
   const canvases = ['welcomeCanvas', 'quizCanvas', 'resultCanvas', 'scoreboardCanvas'];
   canvases.forEach(canvasId => {
-    initializeThreeJSAnimation(canvasId);
+    // Add a small delay to ensure DOM is fully loaded
+    setTimeout(() => {
+      initializeThreeJSAnimation(canvasId);
+    }, 100);
   });
 });
 
