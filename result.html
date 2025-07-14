@@ -7,6 +7,13 @@
   <title>🎉 Quiz Results</title>
   <link rel="stylesheet" href="style.css" />
   <style>
+    canvas#resultCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
     body {
       background: url("background.jpg") no-repeat center center fixed;
       background-size: cover;
@@ -17,6 +24,8 @@
       background: rgba(0, 0, 0, 0.6);
       min-height: 100vh;
       padding: 50px 20px;
+      position: relative;
+      z-index: 1;
     }
 
     .result-box {
@@ -70,6 +79,7 @@
   </style>
 </head>
 <body>
+  <canvas id="resultCanvas"></canvas>
   <div class="overlay">
     <div class="result-box">
       <h2>🎯 Your Score: <span id="scoreDisplay"></span></h2>
@@ -82,6 +92,7 @@
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Configuration -->
   <script src="config.js"></script>
   <!-- Supabase JavaScript Library -->

@@ -751,10 +751,14 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // =========================
-// 3D BACKGROUND (QUIZ PAGE)
+// 3D BACKGROUND ANIMATIONS
 // =========================
-if (typeof THREE !== 'undefined' && document.getElementById('quizCanvas')) {
-  const canvas = document.querySelector("#quizCanvas");
+function initializeThreeJSAnimation(canvasId) {
+  if (typeof THREE === 'undefined' || !document.getElementById(canvasId)) {
+    return;
+  }
+  
+  const canvas = document.querySelector(`#${canvasId}`);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
   camera.position.z = 5;
@@ -792,6 +796,15 @@ if (typeof THREE !== 'undefined' && document.getElementById('quizCanvas')) {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 }
+
+// Initialize animations for all pages
+document.addEventListener('DOMContentLoaded', function() {
+  // Check which canvas exists and initialize accordingly
+  const canvases = ['welcomeCanvas', 'quizCanvas', 'resultCanvas', 'scoreboardCanvas'];
+  canvases.forEach(canvasId => {
+    initializeThreeJSAnimation(canvasId);
+  });
+});
 
 // Debug functions
 function viewStoredScores() {

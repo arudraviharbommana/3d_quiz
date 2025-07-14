@@ -5,8 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>🎬 Cine World - Welcome</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    canvas#welcomeCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .welcome-page {
+      position: relative;
+      z-index: 1;
+    }
+  </style>
 </head>
 <body>
+  <canvas id="welcomeCanvas"></canvas>
   <div class="welcome-page">
     <div class="welcome-container">
       <h1>🎥 Vihar's Cine Square</h1>
@@ -24,6 +38,7 @@
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Configuration -->
   <script src="config.js"></script>
   <!-- Supabase JavaScript Library -->

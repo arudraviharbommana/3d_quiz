@@ -6,6 +6,16 @@
   <title>📋 Quiz Scoreboard</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    #scoreboardCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
     body {
       background: url("background.jpg") no-repeat center center fixed;
       background-size: cover;
@@ -272,6 +282,7 @@
   </style>
 </head>
 <body>
+  <canvas id="scoreboardCanvas"></canvas>
   <div class="board">
     <h2>🏆 Quiz Scoreboard</h2>
     <div style="text-align: center; margin-bottom: 20px;">
@@ -321,6 +332,8 @@
 
   <!-- Configuration -->
   <script src="config.js"></script>
+  <!-- Three.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Supabase JavaScript Library -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <!-- Supabase client configuration -->
