@@ -604,19 +604,25 @@ async function loadScoreboard() {
       const row = document.createElement("tr");
       const rank = index + 1;
       const percentage = entry.percentage || Math.round((entry.score / entry.total) * 100);
-      const date = new Date(entry.date).toLocaleString();
+      const date = new Date(entry.date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
       
+      // Add rank styling classes
+      let rankClass = '';
+      if (rank === 1) rankClass = 'rank-1';
+      else if (rank === 2) rankClass = 'rank-2';
+      else if (rank === 3) rankClass = 'rank-3';
+      
+      row.className = rankClass;
       row.innerHTML = `
-        <td>${rank}. ${entry.name}</td>
-        <td>${entry.email}</td>
-        <td><strong>${entry.score}/${entry.total}</strong> (${percentage}%)</td>
+        <td><strong>#${rank}</strong></td>
+        <td>${entry.name}</td>
+        <td class="score-cell"><strong>${entry.score}/${entry.total}</strong><br><small>(${percentage}%)</small></td>
         <td>${date}</td>
       `;
-      
-      // Highlight top 3
-      if (rank === 1) row.style.background = 'rgba(255, 215, 0, 0.2)'; // Gold
-      else if (rank === 2) row.style.background = 'rgba(192, 192, 192, 0.2)'; // Silver  
-      else if (rank === 3) row.style.background = 'rgba(205, 127, 50, 0.2)'; // Bronze
       
       tbody.appendChild(row);
     });
@@ -633,18 +639,25 @@ async function loadScoreboard() {
         const row = document.createElement("tr");
         const rank = index + 1;
         const percentage = entry.percentage || Math.round((entry.score / entry.total) * 100);
-        const date = new Date(entry.date).toLocaleString();
+        const date = new Date(entry.date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
         
+        // Add rank styling classes
+        let rankClass = '';
+        if (rank === 1) rankClass = 'rank-1';
+        else if (rank === 2) rankClass = 'rank-2';
+        else if (rank === 3) rankClass = 'rank-3';
+        
+        row.className = rankClass;
         row.innerHTML = `
-          <td>${rank}. ${entry.name}</td>
-          <td>${entry.email}</td>
-          <td><strong>${entry.score}/${entry.total}</strong> (${percentage}%)</td>
+          <td><strong>#${rank}</strong></td>
+          <td>${entry.name}</td>
+          <td class="score-cell"><strong>${entry.score}/${entry.total}</strong><br><small>(${percentage}%)</small></td>
           <td>${date}</td>
         `;
-        
-        if (rank === 1) row.style.background = 'rgba(255, 215, 0, 0.2)';
-        else if (rank === 2) row.style.background = 'rgba(192, 192, 192, 0.2)';
-        else if (rank === 3) row.style.background = 'rgba(205, 127, 50, 0.2)';
         
         tbody.appendChild(row);
       });
